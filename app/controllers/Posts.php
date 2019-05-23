@@ -11,20 +11,30 @@
         }
 
         public function index(){
+            $total_post = $this->postModel->getCountOfPost();
+
             $posts = $this->postModel->getPosts();
+//            var_dump($posts); exit();
+
+
+
             $data = [
-                'posts'=>$posts
+                'posts'=>$posts,
+                'total_post'=>$total_post
             ];
             $this->view('posts/index', $data);
         }
 
+        /*
+         * Add post to db
+         */
         public function add(){
             if($_SERVER['REQUEST_METHOD']== 'POST'){
                 //sanitize post array
                 $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
                 $data =[
                     'title' => trim($_POST['title']),
-                    'body' =>trim($_POST['body']),
+                    'body' => preg_replace('/\s+/', ' ', trim($_POST['body'])),
                     'user_id'=> $_SESSION['user_id'],
                     'title_err'=>'',
                     'body_err' => ''
@@ -55,6 +65,7 @@
                 $data =[
                     'title' => '',
                     'body' =>''
+
                 ];
 
                 $this->view('posts/add', $data);
@@ -63,18 +74,41 @@
 
         }
 
+
+        /*
+         * Show detail view of post
+         */
         public function show($id){
             $post = $this->postModel->getPostById($id);
             $user = $this->userModel->getUserById($post->user_id);
+            $comments = $this->postModel->getCommentsDetails($id);
 
+
+
+            //formatting date of post creation time to eg 23-may-2019 03:013 PM
+            $user->created_At  = date("d-M-Y h:i:A", strtotime($user->created_At));
+
+            //formatting date of post comments to eg 23-may-2019 03:013 PM
+            foreach ($comments as $comment){
+                $commented_on = date("d-M-Y h:i:A", strtotime($comment->commented_on));
+                $comment->commented_on = $commented_on;
+            }
+
+             //var_dump($comments); exit();
             $data = [
                 'post'=> $post,
-                'user' => $user
+                'user' => $user,
+                'comment'=>'',
+                'comments'=> $comments
             ];
+            //var_dump($data); exit();
             $this->view('posts/show', $data);
         }
 
-
+        /*
+         *Edit post which is only editable by post author
+         *
+         */
         public function edit($id){
             if($_SERVER['REQUEST_METHOD']== 'POST'){
                 //sanitize post array
@@ -82,7 +116,7 @@
                 $data =[
                     'id'=> $id,
                     'title' => trim($_POST['title']),
-                    'body' =>trim($_POST['body']),
+                    'body' =>preg_replace('/\s+/', ' ', trim($_POST['body'])),
                     'user_id'=> $_SESSION['user_id'],
                     'title_err'=>'',
                     'body_err' => ''
@@ -130,6 +164,10 @@
 
         }
 
+        /*
+         * Delete post which is only deleted by author
+         */
+
         public function delete($id){
             if($_SERVER['REQUEST_METHOD']== 'POST') {
 
@@ -150,6 +188,84 @@
                 }
             }else {
                 redirect('posts');
+            }
+        }
+
+    /*
+     *Add comment given by user on post
+     *
+     */
+        public function addComment($id){
+            if($_SERVER['REQUEST_METHOD']== 'POST'){
+
+                //sanitize post array
+                $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+
+                $post = $this->postModel->getPostById($id);
+                $user = $this->userModel->getUserById($post->user_id);
+                $comments = $this->postModel->getCommentsDetails($id);
+
+                $data =[
+                    'post'=> $post,
+                    'user' => $user,
+                    'post_id' => $id,
+                    'user_id'=> $_SESSION['user_id'],
+                    'comment'=> trim($_POST['comment']),
+                    'comment_err'=>'',
+                    'comments'=> $comments
+                ];
+
+
+                // validate comment
+                if(empty($data['comment'])){
+                    $data['comment_err'] = 'Please enter comment';
+                }
+                //Check comment error exits or not
+                if(empty($data['comment_err'])){
+
+                    //validated
+                    if($this->postModel->addComment($data)){
+                        redirect('posts/show/'.$id);
+                    }else {
+                        die('something went wrong');
+                    }
+                }else{
+                    $this->view('posts/show', $data);
+                }
+            } else {
+                $data =[
+                    'comment' => ''
+                ];
+
+                $this->view('posts/show/'.$id, $data);
+            }
+        }
+
+        /*
+         * Delete comment by using comment id
+         */
+        public function deleteComment($id){
+            $post_id = $_POST['post_id'];
+
+            if($_SERVER['REQUEST_METHOD']== 'POST') {
+
+                // Get existing post from model
+                $post = $this->postModel->getCommentById($id);
+                //var_dump($post); exit();
+                //check owner
+                if($post->user_id != $_SESSION['user_id']){
+                    redirect('posts');
+                }
+
+                if($this->postModel->deleteComment($id)){
+                    //flash('post_added', 'Post deleted');
+                    redirect('posts/show/'.$post_id);
+
+                }else{
+                    die('something went wrong');
+                }
+            }else {
+                redirect('posts/show/'.$post_id);
             }
         }
     }
