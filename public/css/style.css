@@ -1,0 +1,6 @@
+input[type=text]:focus {
+    border: 3px solid #555 !important;
+}
+textarea:focus {
+    border: 3px solid #555 !important;
+}
