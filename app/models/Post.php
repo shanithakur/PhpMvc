@@ -9,8 +9,8 @@
         }
 
         public function getPosts(){
-            $total = 5;
-            $next_page = 5;
+//            $total = 5;
+//            $next_page = 5;
 
             $this->db->query('SELECT *,
             posts.id as postId,
@@ -20,10 +20,13 @@
             FROM posts
              INNER JOIN users
               ON posts.user_id = users.id 
-             ORDER BY posts.created_At DESC LIMIT :limit, :offset');
+             ORDER BY posts.created_At DESC');
 
-            $this->db->bind(':limit',$total, PDO::PARAM_INT);
-            $this->db->bind(':offset',$next_page, PDO::PARAM_INT);
+
+            // LIMIT :limit, :offset
+
+//            $this->db->bind(':limit',$total, PDO::PARAM_INT);
+         //   $this->db->bind(':offset',$next_page, PDO::PARAM_INT);
 //            $this->db->bind(':numRows',$next_page, PDO::PARAM_INT);
             $result = $this->db->resultSet();
 

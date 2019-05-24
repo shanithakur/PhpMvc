@@ -4,7 +4,7 @@
 
 <h1><?php echo $data['post']->title; ?></h1>
 <div class="bg-secondary text-white p-2 mb-3">
-    Written By <?php echo $data['user']->name; ?> on <?php echo $data['user']->created_At;?>
+    Written By <a class="text-white" href="<?php echo URLROOT;?>/users/showProfile/<?php echo $data['user']->id; ?>"><?php echo $data['user']->name; ?></a> on <?php echo $data['user']->created_At;?>
     <!-- Edit and delete buttons -->
     <?php if($data['post']->user_id == $_SESSION['user_id']): ?>
         <hr>
@@ -34,7 +34,7 @@
 <!--Display user comments -->
     <div class="pt-3">
         <?php foreach ($data['comments'] as $comment): ?>
-            <p><b><?php echo $comment->name; ?></b> Commented on : <?php echo $comment->commented_on; ?></p>
+            <p><b><a href="<?php echo URLROOT;?>/users/showProfile/<?php echo $comment->id ?>"><?php echo $comment->name; ?></a></b> Commented on : <?php echo $comment->commented_on; ?></p>
             <p style="padding-left: 10px"><?php echo $comment->comment; ?></p>
 
             <?php if($_SESSION['user_id'] == $comment->user_id): ?>

@@ -4,6 +4,9 @@ class Users extends Controller {
 
     public function __construct()
     {
+//        if(isLoggedIn()){
+//            redirect('posts/index');
+//        }
         $this->userModel = $this->model('User');
     }
 
@@ -171,6 +174,87 @@ class Users extends Controller {
 
             //load view
             $this->view('users/login', $data);
+        }
+    }
+
+    /*
+     * @function showProfile
+     * @param $id(int) Not Required by default 0
+     * @ load profile view with required fields
+     *
+     */
+
+    public function showProfile($id = 0){
+        if($id == 0){
+            $user_id = $_SESSION['user_id'];
+            $user = $this->userModel->getUSerById($user_id);
+            $following = $this->userModel->getUserFollowing($user_id);
+            $followers = $this->userModel->getUserFollower($user_id);
+
+            $is_followed = '';
+            $is_user_follows_me ='';
+
+        }
+        if($id >0 ){
+            $user = $this->userModel->getUSerById($id);
+            $following = $this->userModel->getUserFollowing((int)$id);
+            $followers = $this->userModel->getUserFollower((int)$id);
+
+            //check if user already followed by me
+              if($this->userModel->checkUserAlreadyFollowed((int)$id, (int)$_SESSION['user_id'])){
+                  $is_followed = true;
+              } else {
+                  $is_followed = false;
+              }
+
+          //check if user already follows me
+            if($this->userModel->checkUserAlreadyFollowsMe((int)$id, (int)$_SESSION['user_id'])){
+                $is_user_follows_me = true;
+            } else {
+                $is_user_follows_me = false;
+            }
+        }
+        unset($user->password);
+
+        $data = [
+            'user'=>$user,
+            'following'=> $following,
+            'followers'=>$followers,
+            'isFollowed'=> $is_followed,
+            'isFollowsMe' => $is_user_follows_me
+
+        ];
+
+        $this->view('users/profile', $data);
+    }
+
+
+    /*
+     * Follow user
+     */
+    public function follow($followe_id){
+        if($_SERVER['REQUEST_METHOD']== 'POST'){
+
+            $data =[
+                'follower_id' => $_SESSION['user_id'],
+                'followee_id' => $followe_id
+            ];
+
+            if($this->userModel->addFollower($data)){
+                $user = $this->userModel->getUSerById($followe_id);
+                $following = $this->userModel->getUserFollowing((int)$followe_id);
+                $followers = $this->userModel->getUserFollower((int)$followe_id);
+                unset($user->password); //delete password field from array
+
+                $data = [
+                    'user'=>$user,
+                    'following'=> $following,
+                    'followers'=>$followers
+                ];
+                echo json_encode($data);
+            }
+        } else {
+             echo "failure";
         }
     }
 

@@ -15,9 +15,6 @@
             $total_post = $this->postModel->getCountOfPost();
 
             $posts = $this->postModel->getPosts();
-//            var_dump($posts); exit();
-
-
 
             $data = [
                 'posts'=>$posts,
@@ -41,18 +38,16 @@
                     'body_err' => ''
                 ];
 
-                // validate title
                 if(empty($data['title'])){
                     $data['title_err'] = 'Please enter title';
                 }
 
-                // validate body
                 if(empty($data['body'])){
                     $data['body_err'] = 'Please enter body text';
                 }
 
                 if(empty($data['title_err']) && empty($data['body_err'])){
-                    //validated
+
                     if($this->postModel->addPost($data)){
                         flash('post_added', 'Post added');
                         redirect('posts/index');
@@ -71,8 +66,6 @@
 
                 $this->view('posts/add', $data);
             }
-
-
         }
 
 
@@ -95,14 +88,13 @@
                 $comment->commented_on = $commented_on;
             }
 
-             //var_dump($comments); exit();
             $data = [
                 'post'=> $post,
                 'user' => $user,
                 'comment'=>'',
                 'comments'=> $comments
             ];
-            //var_dump($data); exit();
+
             $this->view('posts/show', $data);
         }
 
@@ -112,6 +104,7 @@
          */
         public function edit($id){
             if($_SERVER['REQUEST_METHOD']== 'POST'){
+
                 //sanitize post array
                 $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
                 $data =[
@@ -146,7 +139,7 @@
                     $this->view('posts/edit', $data);
                 }
             } else {
-                // Get existing post from model
+
                 $post = $this->postModel->getPostById($id);
 
                 //check owner
