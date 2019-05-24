@@ -18,8 +18,9 @@
 </div>
 <p><?php echo $data['post']->body;?></p>
 
+
 <!-- Below code Post comment of user-->
-<form action="<?php echo URLROOT;?>/posts/addComment/<?php echo $data['post']->id ?>" method="post">
+<form action="<?php echo URLROOT;?>/comments/addComment/<?php echo $data['post']->id ?>" method="post">
     <div class="form-group">
         <label for="comment" class="font-weight-bold">Comment: </label>
         <textarea name="comment" class="form-control form-control-lg <?php echo
@@ -37,7 +38,7 @@
             <p style="padding-left: 10px"><?php echo $comment->comment; ?></p>
 
             <?php if($_SESSION['user_id'] == $comment->user_id): ?>
-                <form  action="<?php echo URLROOT?>/posts/deleteComment/<?php echo $comment->comment_id ?>" method="post">
+                <form  action="<?php echo URLROOT?>/comments/deleteComment/<?php echo $comment->comment_id ?>" method="post">
                     <input type="hidden" value="<?php echo $data['post']->id; ?>" name="post_id">
                     <input type="submit" value="Delete" class="btn btn-link">
                 </form>
