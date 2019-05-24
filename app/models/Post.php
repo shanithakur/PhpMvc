@@ -9,16 +9,35 @@
         }
 
         public function getPosts(){
+            $total = 5;
+            $next_page = 5;
+
             $this->db->query('SELECT *,
             posts.id as postId,
-            users.id as userId,
+            users.id as userId,             
+            LEFT(posts.body, 100) as body,
             posts.created_At as postCreated
             FROM posts
              INNER JOIN users
               ON posts.user_id = users.id 
-             ORDER BY posts.created_At DESC ');
+             ORDER BY posts.created_At DESC LIMIT :limit, :offset');
+
+            $this->db->bind(':limit',$total, PDO::PARAM_INT);
+            $this->db->bind(':offset',$next_page, PDO::PARAM_INT);
+//            $this->db->bind(':numRows',$next_page, PDO::PARAM_INT);
             $result = $this->db->resultSet();
+
             return $result;
+        }
+
+        /*
+         * Get count of total no of posts
+         */
+        public function getCountOfPost(){
+            $this->db->query('SELECT * FROM posts');
+            $this->db->execute();
+            $rows = $this->db->rowCount();
+            return $rows;
         }
 
         public function addPost($data){
@@ -69,4 +88,5 @@
                 return false;
             }
         }
+
     }

@@ -17,10 +17,31 @@
         <div class="bg-light p-2 mb-3">
             Written By <?php echo $post->name; ?> on <?php echo $post->postCreated; ?>
         </div>
-        <p class="card-text"><?php echo $post->body;  ?></p>
+        <p class="card-text"><?php echo $post->body;  ?>...</p>
         <a href="<?php echo URLROOT?>/posts/show/<?php echo $post->postId; ?>" class="btn btn-dark">More</a>
     </div>
 <?php endforeach; ?>
+
+<nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-end">
+        <li class="page-item">
+            <a class="page-link" href="#" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+                <span class="sr-only">Previous</span>
+            </a>
+        </li>
+        <?php for($i = 1; $i <= ceil($data['total_post']/5); $i++): ?>
+                <li class="page-item"><a class="page-link" href="<?php echo URLROOT; ?>/posts/index/<?php echo "5/" ?>"><?php echo $i; ?></a></li>
+        <?php endfor; ?>
+
+        <li class="page-item">
+            <a class="page-link" href="#" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+                <span class="sr-only">Next</span>
+            </a>
+        </li>
+    </ul>
+</nav>
 
 
 <?php require APPROOT. '/views/inc/footer.php'; ?>
