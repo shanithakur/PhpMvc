@@ -4,9 +4,6 @@ class Users extends Controller {
 
     public function __construct()
     {
-//        if(isLoggedIn()){
-//            redirect('posts/index');
-//        }
         $this->userModel = $this->model('User');
     }
 
@@ -14,6 +11,11 @@ class Users extends Controller {
 
     }
 
+    /**
+     * validate form data
+     * register new user to db
+     * throw error if user already exits
+     */
     public function register(){
         //check for post
         if($_SERVER['REQUEST_METHOD']== 'POST'){
@@ -86,7 +88,6 @@ class Users extends Controller {
 
 
         } else {
-            //Init data
             $data = [
                 'name' =>'',
                 'email' =>'',
@@ -99,11 +100,15 @@ class Users extends Controller {
 
             ];
 
-            //load view
             $this->view('users/register', $data);
         }
     }
 
+    /**
+     * validate user data
+     * check user by email id
+     * create session of user
+     */
     public function login(){
         //check for post
         if($_SERVER['REQUEST_METHOD']== 'POST'){
@@ -125,22 +130,17 @@ class Users extends Controller {
             //validate email
             if(empty($data['email'])){
                 $data['email_err'] = "Please enter email";
-            }
-
-            //validate name
-            if(empty($data['password'])){
+            } elseif (empty($data['password'])){
                 $data['password_err'] = "Please enter password";
             }
 
 
             //check for user
             if($this->userModel->findUserByEmail($data['email'])){
-                //validate
-                //check and set logged in user
+
                 $loggedInUser = $this->userModel->login($data['email'], $data['password']);
 
                 if($loggedInUser){
-                    //Create session variable
                     $this->createUserSession($loggedInUser);
                 } else {
                     $data['password_err'] = 'Password incorrect';
@@ -151,17 +151,13 @@ class Users extends Controller {
                 $data['email_err'] = 'No user found';
             }
 
-            //make sure errors are empty
             if(empty($data['email_err']) && empty($data['password_err'])){
                 die('SUCCESS');
-            }else{
-
-                //load view with error
+            }else {
                 $this->view('users/login', $data);
             }
 
         } else {
-            //Init data
             $data = [
 
                 'email' =>'',
@@ -172,15 +168,14 @@ class Users extends Controller {
 
             ];
 
-            //load view
             $this->view('users/login', $data);
         }
     }
 
-    /*
+    /**
      * @function showProfile
      * @param $id(int) Not Required by default 0
-     * @ load profile view with required fields
+     * @load profile view with required fields
      *
      */
 
@@ -228,9 +223,9 @@ class Users extends Controller {
         $this->view('users/profile', $data);
     }
 
-
-    /*
-     * Follow user
+    /**
+     * @param $followe_id
+     * @return json encoded data
      */
     public function follow($followe_id){
         if($_SERVER['REQUEST_METHOD']== 'POST'){
@@ -258,7 +253,40 @@ class Users extends Controller {
         }
     }
 
+    /**
+     * @param $followe_id
+     * @return json encoded data
+     */
+    public function unFollow($followe_id){
+        if($_SERVER['REQUEST_METHOD']== 'POST'){
 
+            $data =[
+                'follower_id' => $_SESSION['user_id'],
+                'followee_id' => $followe_id
+            ];
+
+            if($this->userModel->deleteFollower($data)){
+                $user = $this->userModel->getUSerById($followe_id);
+                $following = $this->userModel->getUserFollowing((int)$followe_id);
+                $followers = $this->userModel->getUserFollower((int)$followe_id);
+                unset($user->password); //delete password field from array
+
+                $data = [
+                    'user'=>$user,
+                    'following'=> $following,
+                    'followers'=>$followers
+                ];
+                echo json_encode($data);
+            }
+        } else {
+            echo "failure";
+        }
+    }
+
+    /**
+     * @param $user
+     * create multiple session with different values
+     */
     public function createUserSession($user){
         $_SESSION['user_id'] = $user->id;
         $_SESSION['user_email'] = $user->email;
@@ -268,6 +296,10 @@ class Users extends Controller {
 
     }
 
+    /**
+     * destroy all user related session which were created in createUserSession
+     * @redirect to login page
+     */
     public function logout(){
         unset($_SESSION['user_id']);
         unset($_SESSION['user_email']);
@@ -275,6 +307,5 @@ class Users extends Controller {
         session_destroy();
         redirect('users/login');
     }
-
 
 }

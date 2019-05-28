@@ -20,7 +20,7 @@
 
 
 <!-- Below code Post comment of user-->
-<form action="<?php echo URLROOT;?>/comments/addComment/<?php echo $data['post']->id ?>" method="post">
+<form action="<?php echo URLROOT;?>/comments/addComment/<?php echo $data['post']->id ?>/postsModel" method="post">
     <div class="form-group">
         <label for="comment" class="font-weight-bold">Comment: </label>
         <textarea name="comment" class="form-control form-control-lg <?php echo
@@ -36,9 +36,21 @@
         <?php foreach ($data['comments'] as $comment): ?>
             <p><b><a href="<?php echo URLROOT;?>/users/showProfile/<?php echo $comment->id ?>"><?php echo $comment->name; ?></a></b> Commented on : <?php echo $comment->commented_on; ?></p>
             <p style="padding-left: 10px"><?php echo $comment->comment; ?></p>
+            <div class="container">
+                <a class="like"  id="disable-like-btn<?php echo $comment->comment_id; ?>"  onclick="likeComment(<?php echo $comment->comment_id;?>,<?php echo$data['post']->id?>);">
+                    <i  class="fa fa-thumbs-o-up fa-lg"></i><span id="likes<?php echo $comment->comment_id; ?>">
+                        <?php echo $comment->totallikes; ?>
+                    </span>
+                </a>
+                <a class="dislike" id="disable-dislike-btn<?php echo $comment->comment_id; ?>"   onclick="dislikeComment(<?php echo $comment->comment_id;?>,<?php echo$data['post']->id?>);">
+                    <i class="fa fa-thumbs-o-down fa-lg"></i><span id="dislikes<?php echo $comment->comment_id; ?>">
+                        <?php echo $comment->totaldislikes; ?>
+                    </span>
+                </a>
+            </div>
 
             <?php if($_SESSION['user_id'] == $comment->user_id): ?>
-                <form  action="<?php echo URLROOT?>/comments/deleteComment/<?php echo $comment->comment_id ?>" method="post">
+                <form  action="<?php echo URLROOT?>/comments/deleteComment/<?php echo $comment->comment_id ?>/postsmodel" method="post">
                     <input type="hidden" value="<?php echo $data['post']->id; ?>" name="post_id">
                     <input type="submit" value="Delete" class="btn btn-link">
                 </form>

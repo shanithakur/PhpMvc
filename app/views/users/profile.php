@@ -14,14 +14,7 @@
                         <div class="twPc-divName">
                             <a href="https://twitter.com/mertskaplan"><?php echo $data['user']->name;?></a>
                             <?php if($_SESSION['user_id'] !== $data['user']->id): ?>
-                                <?php if($data['isFollowed']):?>
-                                    <button class="btn btn-primary pull-right" disabled id="followed_btn" onclick="followUser(<?php echo $data['user']->id; ?>)">Followed</button>
-                                <?php elseif($data['isFollowsMe']): ?>
-                                    <button class="btn btn-primary pull-right"  id="follow_btn" onclick="followUser(<?php echo $data['user']->id; ?>)">Follow Back</button>
-                                <?php else: ?>
-                                    <button class="btn btn-primary pull-right"  id="follow_btn" onclick="followUser(<?php echo $data['user']->id; ?>)">Follow</button>
-                                <?php endif; ?>
-
+                                <?php echo showFollowBtn($data); ?>
                             <?php endif; ?>
                         </div>
                         <span>
@@ -50,6 +43,7 @@
     </div>
 
 <script type="text/javascript">
+    //Follow user
     function followUser(followe_id){
 
        var followe_id = followe_id;
@@ -62,12 +56,30 @@
              if(result != 'failure'){
                 $("#total_followers").text(data.followers.follower);
                 $("#total_following").text(data.following.following);
-                $("#follow_btn").text("Followed").attr('disabled', 'true');
+                location.reload();
              }
             }
        })
-
     }
+    //un follow user
+    function unFollowUser(unfollow_id){
+
+       var unfollow_id = unfollow_id;
+
+       $.ajax({
+           url:'<?php echo URLROOT; ?>/users/unFollow/'+unfollow_id,
+           method: 'POST',
+           success: function (result) {
+             var data = JSON.parse(result);
+             if(result != 'failure'){
+                $("#total_followers").text(data.followers.follower);
+                $("#total_following").text(data.following.following);
+                location.reload();
+             }
+            }
+       })
+    }
+
 </script>
 
 <?php require APPROOT. '/views/inc/footer.php'; ?>

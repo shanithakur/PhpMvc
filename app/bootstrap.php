@@ -5,6 +5,7 @@
     //load helper
     require_once 'helpers/url_helper.php';
     require_once 'helpers/session_helper.php';
+    require_once 'helpers/profile_helper.php';
 
     //Auto loads libraries
     spl_autoload_register(function ($className){

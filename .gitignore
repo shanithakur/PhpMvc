@@ -1,2 +1,6 @@
 # Don't track content of these folders
+<<<<<<< HEAD
 .idea/
+=======
+.idea/
+>>>>>>> d73a415f1060555e83c1b6b0e49842bbf72a7edf

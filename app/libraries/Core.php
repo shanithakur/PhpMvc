@@ -43,9 +43,6 @@
             //get params
             $this->params = $url ? array_values($url) : [];
 
-//            echo "this is params";
-//            print_r($this->params); exit();
-
             //Call a callback with array of params
             call_user_func_array([$this->currentController, $this->currentMethod], $this->params);
 

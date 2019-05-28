@@ -8,6 +8,12 @@
             $this->db = new Database();
         }
 
+        /**
+         * @function getPosts
+         * @return object array
+         * fetch posts from posts table.
+         */
+
         public function getPosts(){
 //            $total = 5;
 //            $next_page = 5;
@@ -22,7 +28,6 @@
               ON posts.user_id = users.id 
              ORDER BY posts.created_At DESC');
 
-
             // LIMIT :limit, :offset
 
 //            $this->db->bind(':limit',$total, PDO::PARAM_INT);
@@ -33,7 +38,9 @@
             return $result;
         }
 
-        /*
+        /**
+         * @function getCountOfPost
+         * @retun object array
          * Get count of total no of posts
          */
         public function getCountOfPost(){
@@ -43,6 +50,10 @@
             return $rows;
         }
 
+        /**
+         * @param $data array
+         * @return bool true on success else false
+         */
         public function addPost($data){
             $this->db->query('INSERT INTO posts (title, user_id, body) VALUES (:title, :user_id, :body)');
             $this->db->bind(':title', $data['title']);
@@ -56,6 +67,11 @@
                 return false;
             }
         }
+
+        /**
+         * @param $data
+         * @return bool
+         */
 
         public function updatePost($data){
             $this->db->query('UPDATE posts SET title= :title,  body=:body WHERE id=:id');
@@ -72,6 +88,11 @@
             }
         }
 
+        /**
+         * @param $id
+         * @return mixed
+         */
+
         public function getPostById($id){
             $this->db->query('SELECT * FROM posts WHERE id =:id');
             $this->db->bind(':id', $id);
@@ -80,6 +101,10 @@
             return $row;
         }
 
+        /**
+         * @param $id
+         * @return bool
+         */
         public function deletePost($id){
             $this->db->query('DELETE FROM posts WHERE id=:id');
 

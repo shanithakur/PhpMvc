@@ -1,7 +1,12 @@
 <?php
     session_start();
 
-    //flash message
+/**
+ * @param string $name
+ * @param string $message
+ * @param string $class
+ * @return html div with flash message
+ */
     function flash($name = '', $message = '', $class = 'alert alert-success'){
         if(!empty($name)){
             if(!empty($message) && empty($_SESSION[$name])){
@@ -22,6 +27,10 @@
         }
     }
 
+/**
+ * check if user is logged in or not
+ * @return bool true on success else false
+ */
      function isLoggedIn(){
         if(isset($_SESSION['user_id'])){
             return true;

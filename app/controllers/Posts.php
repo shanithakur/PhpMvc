@@ -11,9 +11,11 @@
             $this->commentModel = $this->model('Comment');
         }
 
+        /**
+         * @load posts/index view with post data
+         */
         public function index(){
             $total_post = $this->postModel->getCountOfPost();
-
             $posts = $this->postModel->getPosts();
 
             $data = [
@@ -23,8 +25,10 @@
             $this->view('posts/index', $data);
         }
 
-        /*
-         * Add post to db
+        /**
+         * validate form data
+         * add new post to db
+         * @loads posts/index page
          */
         public function add(){
             if($_SERVER['REQUEST_METHOD']== 'POST'){
@@ -69,15 +73,24 @@
         }
 
 
-        /*
-         * Show detail view of post
+        /**
+         * @param $id
+         * @loads posts/show view with data containing of post, users, comments
          */
         public function show($id){
             $post = $this->postModel->getPostById($id);
             $user = $this->userModel->getUserById($post->user_id);
             $comments = $this->commentModel->getCommentsDetails($id);
 
+            foreach ($comments as $comment){
+                $total_likes = $this->commentModel->getCommentLikesById($comment->comment_id);
+                $total_dislikes = $this->commentModel->getCommentDislikesById($comment->comment_id);
 
+                $comment->totallikes = $total_likes->likes;
+                $comment->totaldislikes = $total_dislikes->dislikes;
+            }
+
+            //var_dump($comments); exit();
 
             //formatting date of post creation time to eg 23-may-2019 03:013 PM
             $user->created_At  = date("d-M-Y h:i:A", strtotime($user->created_At));
@@ -94,13 +107,15 @@
                 'comment'=>'',
                 'comments'=> $comments
             ];
-
+            //var_dump($data); exit();
             $this->view('posts/show', $data);
         }
 
-        /*
-         *Edit post which is only editable by post author
-         *
+        /**
+         * @param $id
+         * validate form data
+         * update post
+         * @loads posts/index view
          */
         public function edit($id){
             if($_SERVER['REQUEST_METHOD']== 'POST'){
@@ -158,8 +173,10 @@
 
         }
 
-        /*
-         * Delete post which is only deleted by author
+        /**
+         * @param $id
+         * delete post with post id
+         * redirect to posts home page
          */
 
         public function delete($id){
